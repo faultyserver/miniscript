@@ -1,0 +1,2365 @@
+Grammar
+
+    0 $accept: script $end
+
+    1 script: start statement_list end
+
+    2 start: opt_line kSTART NEWLINE
+
+    3 end: kEND opt_line
+
+    4 separator: SEMICOL
+    5          | NEWLINE
+    6          | SEMICOL NEWLINE
+
+    7 opt_line: NEWLINE
+    8         | /* empty */
+
+    9 statement_list: statement_list statement
+   10               | /* empty */
+
+   11 statement: simple_statement separator
+   12          | complex_statement
+
+   13 simple_statement: declaration
+   14                 | assignment
+   15                 | write
+   16                 | assert
+   17                 | return
+   18                 | kBREAK
+   19                 | kCONTINUE
+   20                 | postfix_expr '(' expr_list ')'
+
+   21 complex_statement: conditional opt_line
+   22                  | while_loop opt_line
+   23                  | do_while_loop separator
+   24                  | function_def opt_line
+
+   25 declaration: kVAR ID '=' declaration_value
+   26            | kVAR ID
+
+   27 declaration_value: object_initializer
+   28                  | array_initializer
+   29                  | expr
+
+   30 object_initializer: '{' opt_line field_init_list opt_line '}'
+   31                   | '{' '}'
+
+   32 field_init_list: field_init_list ',' opt_line field_initializer
+   33                | field_initializer
+
+   34 field_initializer: ID ':' expr
+
+   35 array_initializer: '[' opt_line member_init_list opt_line ']'
+   36                  | '[' ']'
+
+   37 member_init_list: member_init_list ',' opt_line expr
+   38                 | expr
+
+   39 assignment: postfix_expr '=' expr
+
+   40 write: kWRITE '(' expr_list ')'
+
+   41 assert: kASSERT '(' expr ')'
+
+   42 return: kRETURN
+   43       | kRETURN expr
+
+   44 conditional: kIF '(' expr ')' '{' NEWLINE statement_list '}' optional_else
+
+   45 optional_else: kELSE conditional
+   46              | kELSE '{' NEWLINE statement_list '}'
+   47              | /* empty */
+
+   48 while_loop: kWHILE '(' expr ')' '{' NEWLINE statement_list '}'
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line kWHILE '(' expr ')'
+
+   50 function_def: kFUNCTION ID '(' param_list ')' '{' NEWLINE statement_list '}'
+
+   51 param_list: param_list ',' ID
+   52           | ID
+   53           | /* empty */
+
+   54 expr_list: expr_list ',' expr
+   55          | expr
+   56          | /* empty */
+
+   57 expr: logical_or_expr
+
+   58 logical_or_expr: logical_and_expr
+   59                | logical_or_expr OR logical_and_expr
+
+   60 logical_and_expr: equality_expr
+   61                 | logical_and_expr AND equality_expr
+
+   62 equality_expr: relational_expr
+   63              | equality_expr EE relational_expr
+   64              | equality_expr NE relational_expr
+
+   65 relational_expr: additive_expr
+   66                | relational_expr '<' additive_expr
+   67                | relational_expr '>' additive_expr
+   68                | relational_expr GE additive_expr
+   69                | relational_expr LE additive_expr
+
+   70 additive_expr: mult_expr
+   71              | additive_expr '+' mult_expr
+   72              | additive_expr '-' mult_expr
+
+   73 mult_expr: unary_expr
+   74          | mult_expr '*' unary_expr
+   75          | mult_expr '/' unary_expr
+
+   76 unary_expr: postfix_expr
+   77           | '!' postfix_expr
+
+   78 postfix_expr: primary_expr
+   79             | postfix_expr '.' ID
+   80             | postfix_expr '[' expr ']'
+   81             | postfix_expr '(' expr_list ')'
+
+   82 primary_expr: '(' expr ')'
+   83             | ID
+   84             | NUM
+   85             | STR
+   86             | kTRUE
+   87             | kFALSE
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 77
+'(' (40) 20 40 41 44 48 49 50 81 82
+')' (41) 20 40 41 44 48 49 50 81 82
+'*' (42) 74
+'+' (43) 71
+',' (44) 32 37 51 54
+'-' (45) 72
+'.' (46) 79
+'/' (47) 75
+':' (58) 34
+'<' (60) 66
+'=' (61) 25 39
+'>' (62) 67
+'[' (91) 35 36 80
+']' (93) 35 36 80
+'{' (123) 30 31 44 46 48 49 50
+'}' (125) 30 31 44 46 48 49 50
+error (256)
+ID (258) 25 26 34 50 51 52 79 83
+NUM (259) 84
+STR (260) 85
+SEMICOL (261) 4 6
+NEWLINE (262) 2 5 6 7 44 46 48 49 50
+kVAR (263) 25 26
+kSTART (264) 2
+kEND (265) 3
+kWRITE (266) 40
+kASSERT (267) 41
+kTRUE (268) 86
+kFALSE (269) 87
+kIF (270) 44
+kELSE (271) 45 46
+kDO (272) 49
+kWHILE (273) 48 49
+kBREAK (274) 18
+kCONTINUE (275) 19
+kFUNCTION (276) 50
+kRETURN (277) 42 43
+LE (278) 69
+EE (279) 63
+NE (280) 64
+GE (281) 68
+OR (282) 59
+AND (283) 61
+
+
+Nonterminals, with rules where they appear
+
+$accept (46)
+    on left: 0
+script (47)
+    on left: 1, on right: 0
+start (48)
+    on left: 2, on right: 1
+end (49)
+    on left: 3, on right: 1
+separator (50)
+    on left: 4 5 6, on right: 11 23
+opt_line (51)
+    on left: 7 8, on right: 2 3 21 22 24 30 32 35 37 49
+statement_list (52)
+    on left: 9 10, on right: 1 9 44 46 48 49 50
+statement (53)
+    on left: 11 12, on right: 9
+simple_statement (54)
+    on left: 13 14 15 16 17 18 19 20, on right: 11
+complex_statement (55)
+    on left: 21 22 23 24, on right: 12
+declaration (56)
+    on left: 25 26, on right: 13
+declaration_value (57)
+    on left: 27 28 29, on right: 25
+object_initializer (58)
+    on left: 30 31, on right: 27
+field_init_list (59)
+    on left: 32 33, on right: 30 32
+field_initializer (60)
+    on left: 34, on right: 32 33
+array_initializer (61)
+    on left: 35 36, on right: 28
+member_init_list (62)
+    on left: 37 38, on right: 35 37
+assignment (63)
+    on left: 39, on right: 14
+write (64)
+    on left: 40, on right: 15
+assert (65)
+    on left: 41, on right: 16
+return (66)
+    on left: 42 43, on right: 17
+conditional (67)
+    on left: 44, on right: 21 45
+optional_else (68)
+    on left: 45 46 47, on right: 44
+while_loop (69)
+    on left: 48, on right: 22
+do_while_loop (70)
+    on left: 49, on right: 23
+function_def (71)
+    on left: 50, on right: 24
+param_list (72)
+    on left: 51 52 53, on right: 50 51
+expr_list (73)
+    on left: 54 55 56, on right: 20 40 54 81
+expr (74)
+    on left: 57, on right: 29 34 37 38 39 41 43 44 48 49 54 55 80 82
+logical_or_expr (75)
+    on left: 58 59, on right: 57 59
+logical_and_expr (76)
+    on left: 60 61, on right: 58 59 61
+equality_expr (77)
+    on left: 62 63 64, on right: 60 61 63 64
+relational_expr (78)
+    on left: 65 66 67 68 69, on right: 62 63 64 66 67 68 69
+additive_expr (79)
+    on left: 70 71 72, on right: 65 66 67 68 69 71 72
+mult_expr (80)
+    on left: 73 74 75, on right: 70 71 72 74 75
+unary_expr (81)
+    on left: 76 77, on right: 73 74 75
+postfix_expr (82)
+    on left: 78 79 80 81, on right: 20 39 76 77 79 80 81
+primary_expr (83)
+    on left: 82 83 84 85 86 87, on right: 78
+
+
+State 0
+
+    0 $accept: . script $end
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    script    go to state 2
+    start     go to state 3
+    opt_line  go to state 4
+
+
+State 1
+
+    7 opt_line: NEWLINE .
+
+    $default  reduce using rule 7 (opt_line)
+
+
+State 2
+
+    0 $accept: script . $end
+
+    $end  shift, and go to state 5
+
+
+State 3
+
+    1 script: start . statement_list end
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 6
+
+
+State 4
+
+    2 start: opt_line . kSTART NEWLINE
+
+    kSTART  shift, and go to state 7
+
+
+State 5
+
+    0 $accept: script $end .
+
+    $default  accept
+
+
+State 6
+
+    1 script: start statement_list . end
+    9 statement_list: statement_list . statement
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kEND       shift, and go to state 12
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+
+    end                go to state 25
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 7
+
+    2 start: opt_line kSTART . NEWLINE
+
+    NEWLINE  shift, and go to state 40
+
+
+State 8
+
+   83 primary_expr: ID .
+
+    $default  reduce using rule 83 (primary_expr)
+
+
+State 9
+
+   84 primary_expr: NUM .
+
+    $default  reduce using rule 84 (primary_expr)
+
+
+State 10
+
+   85 primary_expr: STR .
+
+    $default  reduce using rule 85 (primary_expr)
+
+
+State 11
+
+   25 declaration: kVAR . ID '=' declaration_value
+   26            | kVAR . ID
+
+    ID  shift, and go to state 41
+
+
+State 12
+
+    3 end: kEND . opt_line
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 42
+
+
+State 13
+
+   40 write: kWRITE . '(' expr_list ')'
+
+    '('  shift, and go to state 43
+
+
+State 14
+
+   41 assert: kASSERT . '(' expr ')'
+
+    '('  shift, and go to state 44
+
+
+State 15
+
+   86 primary_expr: kTRUE .
+
+    $default  reduce using rule 86 (primary_expr)
+
+
+State 16
+
+   87 primary_expr: kFALSE .
+
+    $default  reduce using rule 87 (primary_expr)
+
+
+State 17
+
+   44 conditional: kIF . '(' expr ')' '{' NEWLINE statement_list '}' optional_else
+
+    '('  shift, and go to state 45
+
+
+State 18
+
+   49 do_while_loop: kDO . '{' NEWLINE statement_list '}' opt_line kWHILE '(' expr ')'
+
+    '{'  shift, and go to state 46
+
+
+State 19
+
+   48 while_loop: kWHILE . '(' expr ')' '{' NEWLINE statement_list '}'
+
+    '('  shift, and go to state 47
+
+
+State 20
+
+   18 simple_statement: kBREAK .
+
+    $default  reduce using rule 18 (simple_statement)
+
+
+State 21
+
+   19 simple_statement: kCONTINUE .
+
+    $default  reduce using rule 19 (simple_statement)
+
+
+State 22
+
+   50 function_def: kFUNCTION . ID '(' param_list ')' '{' NEWLINE statement_list '}'
+
+    ID  shift, and go to state 48
+
+
+State 23
+
+   42 return: kRETURN .
+   43       | kRETURN . expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    $default  reduce using rule 42 (return)
+
+    expr              go to state 50
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 24
+
+   82 primary_expr: '(' . expr ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 59
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 25
+
+    1 script: start statement_list end .
+
+    $default  reduce using rule 1 (script)
+
+
+State 26
+
+    9 statement_list: statement_list statement .
+
+    $default  reduce using rule 9 (statement_list)
+
+
+State 27
+
+   11 statement: simple_statement . separator
+
+    SEMICOL  shift, and go to state 60
+    NEWLINE  shift, and go to state 61
+
+    separator  go to state 62
+
+
+State 28
+
+   12 statement: complex_statement .
+
+    $default  reduce using rule 12 (statement)
+
+
+State 29
+
+   13 simple_statement: declaration .
+
+    $default  reduce using rule 13 (simple_statement)
+
+
+State 30
+
+   14 simple_statement: assignment .
+
+    $default  reduce using rule 14 (simple_statement)
+
+
+State 31
+
+   15 simple_statement: write .
+
+    $default  reduce using rule 15 (simple_statement)
+
+
+State 32
+
+   16 simple_statement: assert .
+
+    $default  reduce using rule 16 (simple_statement)
+
+
+State 33
+
+   17 simple_statement: return .
+
+    $default  reduce using rule 17 (simple_statement)
+
+
+State 34
+
+   21 complex_statement: conditional . opt_line
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 63
+
+
+State 35
+
+   22 complex_statement: while_loop . opt_line
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 64
+
+
+State 36
+
+   23 complex_statement: do_while_loop . separator
+
+    SEMICOL  shift, and go to state 60
+    NEWLINE  shift, and go to state 61
+
+    separator  go to state 65
+
+
+State 37
+
+   24 complex_statement: function_def . opt_line
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 66
+
+
+State 38
+
+   20 simple_statement: postfix_expr . '(' expr_list ')'
+   39 assignment: postfix_expr . '=' expr
+   79 postfix_expr: postfix_expr . '.' ID
+   80             | postfix_expr . '[' expr ']'
+   81             | postfix_expr . '(' expr_list ')'
+
+    '('  shift, and go to state 67
+    '='  shift, and go to state 68
+    '['  shift, and go to state 69
+    '.'  shift, and go to state 70
+
+
+State 39
+
+   78 postfix_expr: primary_expr .
+
+    $default  reduce using rule 78 (postfix_expr)
+
+
+State 40
+
+    2 start: opt_line kSTART NEWLINE .
+
+    $default  reduce using rule 2 (start)
+
+
+State 41
+
+   25 declaration: kVAR ID . '=' declaration_value
+   26            | kVAR ID .
+
+    '='  shift, and go to state 71
+
+    $default  reduce using rule 26 (declaration)
+
+
+State 42
+
+    3 end: kEND opt_line .
+
+    $default  reduce using rule 3 (end)
+
+
+State 43
+
+   40 write: kWRITE '(' . expr_list ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    $default  reduce using rule 56 (expr_list)
+
+    expr_list         go to state 72
+    expr              go to state 73
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 44
+
+   41 assert: kASSERT '(' . expr ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 74
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 45
+
+   44 conditional: kIF '(' . expr ')' '{' NEWLINE statement_list '}' optional_else
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 75
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 46
+
+   49 do_while_loop: kDO '{' . NEWLINE statement_list '}' opt_line kWHILE '(' expr ')'
+
+    NEWLINE  shift, and go to state 76
+
+
+State 47
+
+   48 while_loop: kWHILE '(' . expr ')' '{' NEWLINE statement_list '}'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 77
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 48
+
+   50 function_def: kFUNCTION ID . '(' param_list ')' '{' NEWLINE statement_list '}'
+
+    '('  shift, and go to state 78
+
+
+State 49
+
+   77 unary_expr: '!' . postfix_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+
+    postfix_expr  go to state 79
+    primary_expr  go to state 39
+
+
+State 50
+
+   43 return: kRETURN expr .
+
+    $default  reduce using rule 43 (return)
+
+
+State 51
+
+   57 expr: logical_or_expr .
+   59 logical_or_expr: logical_or_expr . OR logical_and_expr
+
+    OR  shift, and go to state 80
+
+    $default  reduce using rule 57 (expr)
+
+
+State 52
+
+   58 logical_or_expr: logical_and_expr .
+   61 logical_and_expr: logical_and_expr . AND equality_expr
+
+    AND  shift, and go to state 81
+
+    $default  reduce using rule 58 (logical_or_expr)
+
+
+State 53
+
+   60 logical_and_expr: equality_expr .
+   63 equality_expr: equality_expr . EE relational_expr
+   64              | equality_expr . NE relational_expr
+
+    EE  shift, and go to state 82
+    NE  shift, and go to state 83
+
+    $default  reduce using rule 60 (logical_and_expr)
+
+
+State 54
+
+   62 equality_expr: relational_expr .
+   66 relational_expr: relational_expr . '<' additive_expr
+   67                | relational_expr . '>' additive_expr
+   68                | relational_expr . GE additive_expr
+   69                | relational_expr . LE additive_expr
+
+    LE   shift, and go to state 84
+    GE   shift, and go to state 85
+    '<'  shift, and go to state 86
+    '>'  shift, and go to state 87
+
+    $default  reduce using rule 62 (equality_expr)
+
+
+State 55
+
+   65 relational_expr: additive_expr .
+   71 additive_expr: additive_expr . '+' mult_expr
+   72              | additive_expr . '-' mult_expr
+
+    '+'  shift, and go to state 88
+    '-'  shift, and go to state 89
+
+    $default  reduce using rule 65 (relational_expr)
+
+
+State 56
+
+   70 additive_expr: mult_expr .
+   74 mult_expr: mult_expr . '*' unary_expr
+   75          | mult_expr . '/' unary_expr
+
+    '*'  shift, and go to state 90
+    '/'  shift, and go to state 91
+
+    $default  reduce using rule 70 (additive_expr)
+
+
+State 57
+
+   73 mult_expr: unary_expr .
+
+    $default  reduce using rule 73 (mult_expr)
+
+
+State 58
+
+   76 unary_expr: postfix_expr .
+   79 postfix_expr: postfix_expr . '.' ID
+   80             | postfix_expr . '[' expr ']'
+   81             | postfix_expr . '(' expr_list ')'
+
+    '('  shift, and go to state 92
+    '['  shift, and go to state 69
+    '.'  shift, and go to state 70
+
+    $default  reduce using rule 76 (unary_expr)
+
+
+State 59
+
+   82 primary_expr: '(' expr . ')'
+
+    ')'  shift, and go to state 93
+
+
+State 60
+
+    4 separator: SEMICOL .
+    6          | SEMICOL . NEWLINE
+
+    NEWLINE  shift, and go to state 94
+
+    $default  reduce using rule 4 (separator)
+
+
+State 61
+
+    5 separator: NEWLINE .
+
+    $default  reduce using rule 5 (separator)
+
+
+State 62
+
+   11 statement: simple_statement separator .
+
+    $default  reduce using rule 11 (statement)
+
+
+State 63
+
+   21 complex_statement: conditional opt_line .
+
+    $default  reduce using rule 21 (complex_statement)
+
+
+State 64
+
+   22 complex_statement: while_loop opt_line .
+
+    $default  reduce using rule 22 (complex_statement)
+
+
+State 65
+
+   23 complex_statement: do_while_loop separator .
+
+    $default  reduce using rule 23 (complex_statement)
+
+
+State 66
+
+   24 complex_statement: function_def opt_line .
+
+    $default  reduce using rule 24 (complex_statement)
+
+
+State 67
+
+   20 simple_statement: postfix_expr '(' . expr_list ')'
+   81 postfix_expr: postfix_expr '(' . expr_list ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    $default  reduce using rule 56 (expr_list)
+
+    expr_list         go to state 95
+    expr              go to state 73
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 68
+
+   39 assignment: postfix_expr '=' . expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 96
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 69
+
+   80 postfix_expr: postfix_expr '[' . expr ']'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 97
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 70
+
+   79 postfix_expr: postfix_expr '.' . ID
+
+    ID  shift, and go to state 98
+
+
+State 71
+
+   25 declaration: kVAR ID '=' . declaration_value
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '{'     shift, and go to state 99
+    '['     shift, and go to state 100
+    '!'     shift, and go to state 49
+
+    declaration_value   go to state 101
+    object_initializer  go to state 102
+    array_initializer   go to state 103
+    expr                go to state 104
+    logical_or_expr     go to state 51
+    logical_and_expr    go to state 52
+    equality_expr       go to state 53
+    relational_expr     go to state 54
+    additive_expr       go to state 55
+    mult_expr           go to state 56
+    unary_expr          go to state 57
+    postfix_expr        go to state 58
+    primary_expr        go to state 39
+
+
+State 72
+
+   40 write: kWRITE '(' expr_list . ')'
+   54 expr_list: expr_list . ',' expr
+
+    ')'  shift, and go to state 105
+    ','  shift, and go to state 106
+
+
+State 73
+
+   55 expr_list: expr .
+
+    $default  reduce using rule 55 (expr_list)
+
+
+State 74
+
+   41 assert: kASSERT '(' expr . ')'
+
+    ')'  shift, and go to state 107
+
+
+State 75
+
+   44 conditional: kIF '(' expr . ')' '{' NEWLINE statement_list '}' optional_else
+
+    ')'  shift, and go to state 108
+
+
+State 76
+
+   49 do_while_loop: kDO '{' NEWLINE . statement_list '}' opt_line kWHILE '(' expr ')'
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 109
+
+
+State 77
+
+   48 while_loop: kWHILE '(' expr . ')' '{' NEWLINE statement_list '}'
+
+    ')'  shift, and go to state 110
+
+
+State 78
+
+   50 function_def: kFUNCTION ID '(' . param_list ')' '{' NEWLINE statement_list '}'
+
+    ID  shift, and go to state 111
+
+    $default  reduce using rule 53 (param_list)
+
+    param_list  go to state 112
+
+
+State 79
+
+   77 unary_expr: '!' postfix_expr .
+   79 postfix_expr: postfix_expr . '.' ID
+   80             | postfix_expr . '[' expr ']'
+   81             | postfix_expr . '(' expr_list ')'
+
+    '('  shift, and go to state 92
+    '['  shift, and go to state 69
+    '.'  shift, and go to state 70
+
+    $default  reduce using rule 77 (unary_expr)
+
+
+State 80
+
+   59 logical_or_expr: logical_or_expr OR . logical_and_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    logical_and_expr  go to state 113
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 81
+
+   61 logical_and_expr: logical_and_expr AND . equality_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    equality_expr    go to state 114
+    relational_expr  go to state 54
+    additive_expr    go to state 55
+    mult_expr        go to state 56
+    unary_expr       go to state 57
+    postfix_expr     go to state 58
+    primary_expr     go to state 39
+
+
+State 82
+
+   63 equality_expr: equality_expr EE . relational_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    relational_expr  go to state 115
+    additive_expr    go to state 55
+    mult_expr        go to state 56
+    unary_expr       go to state 57
+    postfix_expr     go to state 58
+    primary_expr     go to state 39
+
+
+State 83
+
+   64 equality_expr: equality_expr NE . relational_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    relational_expr  go to state 116
+    additive_expr    go to state 55
+    mult_expr        go to state 56
+    unary_expr       go to state 57
+    postfix_expr     go to state 58
+    primary_expr     go to state 39
+
+
+State 84
+
+   69 relational_expr: relational_expr LE . additive_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    additive_expr  go to state 117
+    mult_expr      go to state 56
+    unary_expr     go to state 57
+    postfix_expr   go to state 58
+    primary_expr   go to state 39
+
+
+State 85
+
+   68 relational_expr: relational_expr GE . additive_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    additive_expr  go to state 118
+    mult_expr      go to state 56
+    unary_expr     go to state 57
+    postfix_expr   go to state 58
+    primary_expr   go to state 39
+
+
+State 86
+
+   66 relational_expr: relational_expr '<' . additive_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    additive_expr  go to state 119
+    mult_expr      go to state 56
+    unary_expr     go to state 57
+    postfix_expr   go to state 58
+    primary_expr   go to state 39
+
+
+State 87
+
+   67 relational_expr: relational_expr '>' . additive_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    additive_expr  go to state 120
+    mult_expr      go to state 56
+    unary_expr     go to state 57
+    postfix_expr   go to state 58
+    primary_expr   go to state 39
+
+
+State 88
+
+   71 additive_expr: additive_expr '+' . mult_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    mult_expr     go to state 121
+    unary_expr    go to state 57
+    postfix_expr  go to state 58
+    primary_expr  go to state 39
+
+
+State 89
+
+   72 additive_expr: additive_expr '-' . mult_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    mult_expr     go to state 122
+    unary_expr    go to state 57
+    postfix_expr  go to state 58
+    primary_expr  go to state 39
+
+
+State 90
+
+   74 mult_expr: mult_expr '*' . unary_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    unary_expr    go to state 123
+    postfix_expr  go to state 58
+    primary_expr  go to state 39
+
+
+State 91
+
+   75 mult_expr: mult_expr '/' . unary_expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    unary_expr    go to state 124
+    postfix_expr  go to state 58
+    primary_expr  go to state 39
+
+
+State 92
+
+   81 postfix_expr: postfix_expr '(' . expr_list ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    $default  reduce using rule 56 (expr_list)
+
+    expr_list         go to state 125
+    expr              go to state 73
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 93
+
+   82 primary_expr: '(' expr ')' .
+
+    $default  reduce using rule 82 (primary_expr)
+
+
+State 94
+
+    6 separator: SEMICOL NEWLINE .
+
+    $default  reduce using rule 6 (separator)
+
+
+State 95
+
+   20 simple_statement: postfix_expr '(' expr_list . ')'
+   54 expr_list: expr_list . ',' expr
+   81 postfix_expr: postfix_expr '(' expr_list . ')'
+
+    ')'  shift, and go to state 126
+    ','  shift, and go to state 106
+
+
+State 96
+
+   39 assignment: postfix_expr '=' expr .
+
+    $default  reduce using rule 39 (assignment)
+
+
+State 97
+
+   80 postfix_expr: postfix_expr '[' expr . ']'
+
+    ']'  shift, and go to state 127
+
+
+State 98
+
+   79 postfix_expr: postfix_expr '.' ID .
+
+    $default  reduce using rule 79 (postfix_expr)
+
+
+State 99
+
+   30 object_initializer: '{' . opt_line field_init_list opt_line '}'
+   31                   | '{' . '}'
+
+    NEWLINE  shift, and go to state 1
+    '}'      shift, and go to state 128
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 129
+
+
+State 100
+
+   35 array_initializer: '[' . opt_line member_init_list opt_line ']'
+   36                  | '[' . ']'
+
+    NEWLINE  shift, and go to state 1
+    ']'      shift, and go to state 130
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 131
+
+
+State 101
+
+   25 declaration: kVAR ID '=' declaration_value .
+
+    $default  reduce using rule 25 (declaration)
+
+
+State 102
+
+   27 declaration_value: object_initializer .
+
+    $default  reduce using rule 27 (declaration_value)
+
+
+State 103
+
+   28 declaration_value: array_initializer .
+
+    $default  reduce using rule 28 (declaration_value)
+
+
+State 104
+
+   29 declaration_value: expr .
+
+    $default  reduce using rule 29 (declaration_value)
+
+
+State 105
+
+   40 write: kWRITE '(' expr_list ')' .
+
+    $default  reduce using rule 40 (write)
+
+
+State 106
+
+   54 expr_list: expr_list ',' . expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 132
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 107
+
+   41 assert: kASSERT '(' expr ')' .
+
+    $default  reduce using rule 41 (assert)
+
+
+State 108
+
+   44 conditional: kIF '(' expr ')' . '{' NEWLINE statement_list '}' optional_else
+
+    '{'  shift, and go to state 133
+
+
+State 109
+
+    9 statement_list: statement_list . statement
+   49 do_while_loop: kDO '{' NEWLINE statement_list . '}' opt_line kWHILE '(' expr ')'
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+    '}'        shift, and go to state 134
+
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 110
+
+   48 while_loop: kWHILE '(' expr ')' . '{' NEWLINE statement_list '}'
+
+    '{'  shift, and go to state 135
+
+
+State 111
+
+   52 param_list: ID .
+
+    $default  reduce using rule 52 (param_list)
+
+
+State 112
+
+   50 function_def: kFUNCTION ID '(' param_list . ')' '{' NEWLINE statement_list '}'
+   51 param_list: param_list . ',' ID
+
+    ')'  shift, and go to state 136
+    ','  shift, and go to state 137
+
+
+State 113
+
+   59 logical_or_expr: logical_or_expr OR logical_and_expr .
+   61 logical_and_expr: logical_and_expr . AND equality_expr
+
+    AND  shift, and go to state 81
+
+    $default  reduce using rule 59 (logical_or_expr)
+
+
+State 114
+
+   61 logical_and_expr: logical_and_expr AND equality_expr .
+   63 equality_expr: equality_expr . EE relational_expr
+   64              | equality_expr . NE relational_expr
+
+    EE  shift, and go to state 82
+    NE  shift, and go to state 83
+
+    $default  reduce using rule 61 (logical_and_expr)
+
+
+State 115
+
+   63 equality_expr: equality_expr EE relational_expr .
+   66 relational_expr: relational_expr . '<' additive_expr
+   67                | relational_expr . '>' additive_expr
+   68                | relational_expr . GE additive_expr
+   69                | relational_expr . LE additive_expr
+
+    LE   shift, and go to state 84
+    GE   shift, and go to state 85
+    '<'  shift, and go to state 86
+    '>'  shift, and go to state 87
+
+    $default  reduce using rule 63 (equality_expr)
+
+
+State 116
+
+   64 equality_expr: equality_expr NE relational_expr .
+   66 relational_expr: relational_expr . '<' additive_expr
+   67                | relational_expr . '>' additive_expr
+   68                | relational_expr . GE additive_expr
+   69                | relational_expr . LE additive_expr
+
+    LE   shift, and go to state 84
+    GE   shift, and go to state 85
+    '<'  shift, and go to state 86
+    '>'  shift, and go to state 87
+
+    $default  reduce using rule 64 (equality_expr)
+
+
+State 117
+
+   69 relational_expr: relational_expr LE additive_expr .
+   71 additive_expr: additive_expr . '+' mult_expr
+   72              | additive_expr . '-' mult_expr
+
+    '+'  shift, and go to state 88
+    '-'  shift, and go to state 89
+
+    $default  reduce using rule 69 (relational_expr)
+
+
+State 118
+
+   68 relational_expr: relational_expr GE additive_expr .
+   71 additive_expr: additive_expr . '+' mult_expr
+   72              | additive_expr . '-' mult_expr
+
+    '+'  shift, and go to state 88
+    '-'  shift, and go to state 89
+
+    $default  reduce using rule 68 (relational_expr)
+
+
+State 119
+
+   66 relational_expr: relational_expr '<' additive_expr .
+   71 additive_expr: additive_expr . '+' mult_expr
+   72              | additive_expr . '-' mult_expr
+
+    '+'  shift, and go to state 88
+    '-'  shift, and go to state 89
+
+    $default  reduce using rule 66 (relational_expr)
+
+
+State 120
+
+   67 relational_expr: relational_expr '>' additive_expr .
+   71 additive_expr: additive_expr . '+' mult_expr
+   72              | additive_expr . '-' mult_expr
+
+    '+'  shift, and go to state 88
+    '-'  shift, and go to state 89
+
+    $default  reduce using rule 67 (relational_expr)
+
+
+State 121
+
+   71 additive_expr: additive_expr '+' mult_expr .
+   74 mult_expr: mult_expr . '*' unary_expr
+   75          | mult_expr . '/' unary_expr
+
+    '*'  shift, and go to state 90
+    '/'  shift, and go to state 91
+
+    $default  reduce using rule 71 (additive_expr)
+
+
+State 122
+
+   72 additive_expr: additive_expr '-' mult_expr .
+   74 mult_expr: mult_expr . '*' unary_expr
+   75          | mult_expr . '/' unary_expr
+
+    '*'  shift, and go to state 90
+    '/'  shift, and go to state 91
+
+    $default  reduce using rule 72 (additive_expr)
+
+
+State 123
+
+   74 mult_expr: mult_expr '*' unary_expr .
+
+    $default  reduce using rule 74 (mult_expr)
+
+
+State 124
+
+   75 mult_expr: mult_expr '/' unary_expr .
+
+    $default  reduce using rule 75 (mult_expr)
+
+
+State 125
+
+   54 expr_list: expr_list . ',' expr
+   81 postfix_expr: postfix_expr '(' expr_list . ')'
+
+    ')'  shift, and go to state 138
+    ','  shift, and go to state 106
+
+
+State 126
+
+   20 simple_statement: postfix_expr '(' expr_list ')' .
+   81 postfix_expr: postfix_expr '(' expr_list ')' .
+
+    SEMICOL   reduce using rule 20 (simple_statement)
+    NEWLINE   reduce using rule 20 (simple_statement)
+    $default  reduce using rule 81 (postfix_expr)
+
+
+State 127
+
+   80 postfix_expr: postfix_expr '[' expr ']' .
+
+    $default  reduce using rule 80 (postfix_expr)
+
+
+State 128
+
+   31 object_initializer: '{' '}' .
+
+    $default  reduce using rule 31 (object_initializer)
+
+
+State 129
+
+   30 object_initializer: '{' opt_line . field_init_list opt_line '}'
+
+    ID  shift, and go to state 139
+
+    field_init_list    go to state 140
+    field_initializer  go to state 141
+
+
+State 130
+
+   36 array_initializer: '[' ']' .
+
+    $default  reduce using rule 36 (array_initializer)
+
+
+State 131
+
+   35 array_initializer: '[' opt_line . member_init_list opt_line ']'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    member_init_list  go to state 142
+    expr              go to state 143
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 132
+
+   54 expr_list: expr_list ',' expr .
+
+    $default  reduce using rule 54 (expr_list)
+
+
+State 133
+
+   44 conditional: kIF '(' expr ')' '{' . NEWLINE statement_list '}' optional_else
+
+    NEWLINE  shift, and go to state 144
+
+
+State 134
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' . opt_line kWHILE '(' expr ')'
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 145
+
+
+State 135
+
+   48 while_loop: kWHILE '(' expr ')' '{' . NEWLINE statement_list '}'
+
+    NEWLINE  shift, and go to state 146
+
+
+State 136
+
+   50 function_def: kFUNCTION ID '(' param_list ')' . '{' NEWLINE statement_list '}'
+
+    '{'  shift, and go to state 147
+
+
+State 137
+
+   51 param_list: param_list ',' . ID
+
+    ID  shift, and go to state 148
+
+
+State 138
+
+   81 postfix_expr: postfix_expr '(' expr_list ')' .
+
+    $default  reduce using rule 81 (postfix_expr)
+
+
+State 139
+
+   34 field_initializer: ID . ':' expr
+
+    ':'  shift, and go to state 149
+
+
+State 140
+
+   30 object_initializer: '{' opt_line field_init_list . opt_line '}'
+   32 field_init_list: field_init_list . ',' opt_line field_initializer
+
+    NEWLINE  shift, and go to state 1
+    ','      shift, and go to state 150
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 151
+
+
+State 141
+
+   33 field_init_list: field_initializer .
+
+    $default  reduce using rule 33 (field_init_list)
+
+
+State 142
+
+   35 array_initializer: '[' opt_line member_init_list . opt_line ']'
+   37 member_init_list: member_init_list . ',' opt_line expr
+
+    NEWLINE  shift, and go to state 1
+    ','      shift, and go to state 152
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 153
+
+
+State 143
+
+   38 member_init_list: expr .
+
+    $default  reduce using rule 38 (member_init_list)
+
+
+State 144
+
+   44 conditional: kIF '(' expr ')' '{' NEWLINE . statement_list '}' optional_else
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 154
+
+
+State 145
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line . kWHILE '(' expr ')'
+
+    kWHILE  shift, and go to state 155
+
+
+State 146
+
+   48 while_loop: kWHILE '(' expr ')' '{' NEWLINE . statement_list '}'
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 156
+
+
+State 147
+
+   50 function_def: kFUNCTION ID '(' param_list ')' '{' . NEWLINE statement_list '}'
+
+    NEWLINE  shift, and go to state 157
+
+
+State 148
+
+   51 param_list: param_list ',' ID .
+
+    $default  reduce using rule 51 (param_list)
+
+
+State 149
+
+   34 field_initializer: ID ':' . expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 158
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 150
+
+   32 field_init_list: field_init_list ',' . opt_line field_initializer
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 159
+
+
+State 151
+
+   30 object_initializer: '{' opt_line field_init_list opt_line . '}'
+
+    '}'  shift, and go to state 160
+
+
+State 152
+
+   37 member_init_list: member_init_list ',' . opt_line expr
+
+    NEWLINE  shift, and go to state 1
+
+    $default  reduce using rule 8 (opt_line)
+
+    opt_line  go to state 161
+
+
+State 153
+
+   35 array_initializer: '[' opt_line member_init_list opt_line . ']'
+
+    ']'  shift, and go to state 162
+
+
+State 154
+
+    9 statement_list: statement_list . statement
+   44 conditional: kIF '(' expr ')' '{' NEWLINE statement_list . '}' optional_else
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+    '}'        shift, and go to state 163
+
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 155
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line kWHILE . '(' expr ')'
+
+    '('  shift, and go to state 164
+
+
+State 156
+
+    9 statement_list: statement_list . statement
+   48 while_loop: kWHILE '(' expr ')' '{' NEWLINE statement_list . '}'
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+    '}'        shift, and go to state 165
+
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 157
+
+   50 function_def: kFUNCTION ID '(' param_list ')' '{' NEWLINE . statement_list '}'
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 166
+
+
+State 158
+
+   34 field_initializer: ID ':' expr .
+
+    $default  reduce using rule 34 (field_initializer)
+
+
+State 159
+
+   32 field_init_list: field_init_list ',' opt_line . field_initializer
+
+    ID  shift, and go to state 139
+
+    field_initializer  go to state 167
+
+
+State 160
+
+   30 object_initializer: '{' opt_line field_init_list opt_line '}' .
+
+    $default  reduce using rule 30 (object_initializer)
+
+
+State 161
+
+   37 member_init_list: member_init_list ',' opt_line . expr
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 168
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 162
+
+   35 array_initializer: '[' opt_line member_init_list opt_line ']' .
+
+    $default  reduce using rule 35 (array_initializer)
+
+
+State 163
+
+   44 conditional: kIF '(' expr ')' '{' NEWLINE statement_list '}' . optional_else
+
+    kELSE  shift, and go to state 169
+
+    $default  reduce using rule 47 (optional_else)
+
+    optional_else  go to state 170
+
+
+State 164
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line kWHILE '(' . expr ')'
+
+    ID      shift, and go to state 8
+    NUM     shift, and go to state 9
+    STR     shift, and go to state 10
+    kTRUE   shift, and go to state 15
+    kFALSE  shift, and go to state 16
+    '('     shift, and go to state 24
+    '!'     shift, and go to state 49
+
+    expr              go to state 171
+    logical_or_expr   go to state 51
+    logical_and_expr  go to state 52
+    equality_expr     go to state 53
+    relational_expr   go to state 54
+    additive_expr     go to state 55
+    mult_expr         go to state 56
+    unary_expr        go to state 57
+    postfix_expr      go to state 58
+    primary_expr      go to state 39
+
+
+State 165
+
+   48 while_loop: kWHILE '(' expr ')' '{' NEWLINE statement_list '}' .
+
+    $default  reduce using rule 48 (while_loop)
+
+
+State 166
+
+    9 statement_list: statement_list . statement
+   50 function_def: kFUNCTION ID '(' param_list ')' '{' NEWLINE statement_list . '}'
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+    '}'        shift, and go to state 172
+
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 167
+
+   32 field_init_list: field_init_list ',' opt_line field_initializer .
+
+    $default  reduce using rule 32 (field_init_list)
+
+
+State 168
+
+   37 member_init_list: member_init_list ',' opt_line expr .
+
+    $default  reduce using rule 37 (member_init_list)
+
+
+State 169
+
+   45 optional_else: kELSE . conditional
+   46              | kELSE . '{' NEWLINE statement_list '}'
+
+    kIF  shift, and go to state 17
+    '{'  shift, and go to state 173
+
+    conditional  go to state 174
+
+
+State 170
+
+   44 conditional: kIF '(' expr ')' '{' NEWLINE statement_list '}' optional_else .
+
+    $default  reduce using rule 44 (conditional)
+
+
+State 171
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line kWHILE '(' expr . ')'
+
+    ')'  shift, and go to state 175
+
+
+State 172
+
+   50 function_def: kFUNCTION ID '(' param_list ')' '{' NEWLINE statement_list '}' .
+
+    $default  reduce using rule 50 (function_def)
+
+
+State 173
+
+   46 optional_else: kELSE '{' . NEWLINE statement_list '}'
+
+    NEWLINE  shift, and go to state 176
+
+
+State 174
+
+   45 optional_else: kELSE conditional .
+
+    $default  reduce using rule 45 (optional_else)
+
+
+State 175
+
+   49 do_while_loop: kDO '{' NEWLINE statement_list '}' opt_line kWHILE '(' expr ')' .
+
+    $default  reduce using rule 49 (do_while_loop)
+
+
+State 176
+
+   46 optional_else: kELSE '{' NEWLINE . statement_list '}'
+
+    $default  reduce using rule 10 (statement_list)
+
+    statement_list  go to state 177
+
+
+State 177
+
+    9 statement_list: statement_list . statement
+   46 optional_else: kELSE '{' NEWLINE statement_list . '}'
+
+    ID         shift, and go to state 8
+    NUM        shift, and go to state 9
+    STR        shift, and go to state 10
+    kVAR       shift, and go to state 11
+    kWRITE     shift, and go to state 13
+    kASSERT    shift, and go to state 14
+    kTRUE      shift, and go to state 15
+    kFALSE     shift, and go to state 16
+    kIF        shift, and go to state 17
+    kDO        shift, and go to state 18
+    kWHILE     shift, and go to state 19
+    kBREAK     shift, and go to state 20
+    kCONTINUE  shift, and go to state 21
+    kFUNCTION  shift, and go to state 22
+    kRETURN    shift, and go to state 23
+    '('        shift, and go to state 24
+    '}'        shift, and go to state 178
+
+    statement          go to state 26
+    simple_statement   go to state 27
+    complex_statement  go to state 28
+    declaration        go to state 29
+    assignment         go to state 30
+    write              go to state 31
+    assert             go to state 32
+    return             go to state 33
+    conditional        go to state 34
+    while_loop         go to state 35
+    do_while_loop      go to state 36
+    function_def       go to state 37
+    postfix_expr       go to state 38
+    primary_expr       go to state 39
+
+
+State 178
+
+   46 optional_else: kELSE '{' NEWLINE statement_list '}' .
+
+    $default  reduce using rule 46 (optional_else)
